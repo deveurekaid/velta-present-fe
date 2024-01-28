@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 
+#DOMAIN API HANDLER
 PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
 def getStudents():
     key = 'id'
