@@ -2,14 +2,13 @@ import streamlit as st
 import requests
 import json
 
-GET_API= "https://mocki.io/v1/e5573ebb-6fe1-47d9-98ad-8f15acc29b0c"
-# POST_API= ""
-
-#Parse Query Params
-# key = 'student_id'
-# query_params= st.query_params.get_all(key)
-# student_id= query_params[0]
-
+#DOMAIN API HANDLER
+PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
+def getStudents():
+    key = 'id'
+    query_params= st.experimental_get_query_params()
+    API_PATH = PATH_DOMAIN + "/students/" + query_params[key][0]
+    return API_PATH
 
 class MockResponse:
     def __init__(self, json_data, status_code):
@@ -32,7 +31,7 @@ def student_attendance(data):
     studentId = st.text_input(label='ID', value= data['id'],key='studentId', disabled=st.session_state.disabled)
     studentName = st.text_input(label='Name', value= data['name'],key='studentName', disabled=st.session_state.disabled)
     totalPresent = st.text_input(label='Total Presence', value= data['totalPresent'],key='totalPresent', disabled=st.session_state.disabled)
-    availableQuota = st.text_input(label='Available Attendance', value= data['availableQuota'],key='availableQuota', disabled=st.session_state.disabled)
+    availableQouta = st.text_input(label='Available Attendance', value= data['availableQuota'],key='availableQuota', disabled=st.session_state.disabled)
 
     # Mentor Validation
     with st.form(key='my_form', clear_on_submit=True):
@@ -49,8 +48,8 @@ def student_attendance(data):
         form_data = {
         'studentId': studentId,
         'studentName': studentName,
-        'totalAttendance': totalPresent,
-        'availableAttendance': availableQuota,
+        'totalPresent': totalPresent,
+        'availableQuota': availableQouta,
         'mentorName': mentorName,
         'mentorPassword': mentorPassword
         }
@@ -58,26 +57,26 @@ def student_attendance(data):
         # Simulate a successful POST response
         post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
 
-        # Check if the post request was successful
-        if post_response.status_code == 200:
-            print(post_response.json())
-            # print('Presence Successfully')
-            st.success('Presence Success!', icon="✅")
-        else:
-            print('Failed to post data')
-
-        # Post the data to the API
-        # post_response = requests.post(POST_API, data=form_data)
-
         # # Check if the post request was successful
         # if post_response.status_code == 200:
-        #     st.write('Presence Successfully')
+        #     print(post_response.json())
+        #     # print('Presence Successfully')
+        #     st.success('Presence Success!', icon="✅")
         # else:
-        #     st.write('Failed to post data')
+        #     print('Failed to post data')
+
+        # Post the data to the API
+        post_response = requests.post(POST_API, data=form_data)
+
+        # Check if the post request was successful
+        if post_response.status_code == 200:
+            st.write('Presence Successfully')
+        else:
+            st.write('Failed to post data')
 
 # GET DATA FROM API
 # Hit the API
-response = requests.get(GET_API)
+response = requests.get(getStudents())
 
 # Check if the request was successful
 if response.status_code == 200:
