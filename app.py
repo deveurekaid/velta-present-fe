@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
-import json
 
 #DOMAIN API HANDLER
-PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
+PATH_DOMAIN = "https://velta-present-be-staging.deveureka.com/v1"
 
 def queryIdParam():
     try:
@@ -65,16 +64,15 @@ def student_attendance(data):
         }
 
         # Simulate a successful POST response
-        post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
+        # post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
 
         # Post the data to the API
-        post_response = requests.post(postStudentsPresence(), data=form_data)
-
+        post_response = requests.post(postStudentsPresence(), json=form_data)
         # Check if the post request was successful
-        if post_response.status_code == 200:
-            st.write('Presence Successfully')
+        if post_response.status_code == 201:
+            st.success('Presence Successfully')
         else:
-            st.write('Failed to post data')
+            st.error('Failed to post data')
 
 # GET DATA FROM API
 # Hit the API
@@ -84,8 +82,10 @@ response = requests.get(getStudents())
 if response.status_code == 200:
     # Convert the response to JSON
     data = response.json()
-    student_attendance(data['data'])
+    if data['data']['totalPresent'] == data['data']['availableQuota']:
+        st.error('Student has reached the maximum attendance')
+    else:
+        student_attendance(data['data'])
 
 else:
     st.write('Failed to get data from the API')
-
