@@ -1,13 +1,12 @@
 import streamlit as st
 import requests
-import json
 
 #DOMAIN API HANDLER
 PATH_DOMAIN = "https://velta-present-be-staging.deveureka.com/v1"
 
 def queryIdParam():
     try:
-        key = 'id'
+        key = 'student_id'
         query_params= st.experimental_get_query_params()
         if query_params:
             student_id= query_params[key][0]
@@ -45,7 +44,7 @@ def student_attendance(data):
     studentId = st.text_input(label='ID', value= data['id'],key='studentId', disabled=st.session_state.disabled)
     studentName = st.text_input(label='Name', value= data['name'],key='studentName', disabled=st.session_state.disabled)
     totalPresent = st.text_input(label='Total Presence', value= data['totalPresent'],key='totalPresent', disabled=st.session_state.disabled)
-    availableQouta = st.text_input(label='Available Attendance', value= data['availableQuota'],key='availableQuota', disabled=st.session_state.disabled)
+    availableQouta = st.text_input(label='Available Attendance', value = int(data['availableQuota']) - int(data['totalPresent']),key='availableQuota', disabled=st.session_state.disabled)
 
     # Mentor Validation
     with st.form(key='my_form', clear_on_submit=True):
