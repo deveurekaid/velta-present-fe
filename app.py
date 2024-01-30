@@ -3,13 +3,27 @@ import requests
 import json
 
 #DOMAIN API HANDLER
-PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
-def getStudents():
-    key = 'id'
-    query_params= st.experimental_get_query_params()
-    API_PATH = PATH_DOMAIN + "/students/" + query_params[key][0]
-    return API_PATH
+PATH_DOMAIN = "https://velta-present-staging.deveureka.com/v1"
 
+def queryIdParam():
+    try:
+        key = 'id'
+        query_params= st.experimental_get_query_params()
+        if query_params:
+            student_id= query_params[key][0]
+            return student_id
+        else:
+            st.error("The student 'id' query parameter is missing.")
+            return None
+    except Exception as e:
+        st.error(f"An error occured: {e}")
+        return None
+
+def getStudents(student_id=queryIdParam()):
+    return f"{PATH_DOMAIN}/students/{student_id}"
+
+def postStudentsPresence(student_id=queryIdParam()):
+    return f"{PATH_DOMAIN}/students/{student_id}/present"
 class MockResponse:
     def __init__(self, json_data, status_code):
         self.json_data = json_data
@@ -46,27 +60,15 @@ def student_attendance(data):
         # st.write(f'ID: {studentId}, Student Name: {studentName}, Total Presence: {totalAttendance}, Available Quota: {availableAttendance} by Mentor Name: {mentorName} with password: {mentorPassword}')
         
         form_data = {
-        'studentId': studentId,
-        'studentName': studentName,
-        'totalPresent': totalPresent,
-        'availableQuota': availableQouta,
-        'mentorName': mentorName,
-        'mentorPassword': mentorPassword
+        'username': mentorName,
+        'password': mentorPassword
         }
 
         # Simulate a successful POST response
         post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
 
-        # # Check if the post request was successful
-        # if post_response.status_code == 200:
-        #     print(post_response.json())
-        #     # print('Presence Successfully')
-        #     st.success('Presence Success!', icon="✅")
-        # else:
-        #     print('Failed to post data')
-
         # Post the data to the API
-        post_response = requests.post(POST_API, data=form_data)
+        post_response = requests.post(postStudentsPresence(), data=form_data)
 
         # Check if the post request was successful
         if post_response.status_code == 200:
