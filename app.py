@@ -44,7 +44,7 @@ def student_attendance(data):
     studentId = st.text_input(label='ID', value= data['id'],key='studentId', disabled=st.session_state.disabled)
     studentName = st.text_input(label='Name', value= data['name'],key='studentName', disabled=st.session_state.disabled)
     totalPresent = st.text_input(label='Total Presence', value= data['totalPresent'],key='totalPresent', disabled=st.session_state.disabled)
-    availableQouta = st.text_input(label='Available Attendance', value= data['availableQuota'] - data['totalPresent'],key='availableQuota', disabled=st.session_state.disabled)
+    availableQouta = st.text_input(label='Available Attendance', value = int(data['availableQuota']) - int(data['totalPresent']),key='availableQuota', disabled=st.session_state.disabled)
 
     # Mentor Validation
     with st.form(key='my_form', clear_on_submit=True):
