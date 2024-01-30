@@ -3,7 +3,7 @@ import requests
 import json
 
 #DOMAIN API HANDLER
-PATH_DOMAIN = "https://velta-present-staging.deveureka.com/v1"
+PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
 
 def queryIdParam():
     try:
