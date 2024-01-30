@@ -2,11 +2,11 @@ import streamlit as st
 import requests
 
 #DOMAIN API HANDLER
-PATH_DOMAIN = "https://velta-present-be-staging.deveureka.com/v1"
+PATH_DOMAIN = "https://velta-present-be.deveureka.com/v1"
 
 def queryIdParam():
     try:
-        key = 'id'
+        key = 'student_id'
         query_params= st.experimental_get_query_params()
         if query_params:
             student_id= query_params[key][0]
