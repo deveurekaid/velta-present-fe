@@ -2,15 +2,28 @@ import streamlit as st
 import requests
 import json
 
-GET_API= "https://mocki.io/v1/e5573ebb-6fe1-47d9-98ad-8f15acc29b0c"
-# POST_API= ""
+#DOMAIN API HANDLER
+PATH_DOMAIN = "https://velta-present-be-staging.deveureka.com/v1"
 
-#Parse Query Params
-# key = 'student_id'
-# query_params= st.query_params.get_all(key)
-# student_id= query_params[0]
+def queryIdParam():
+    try:
+        key = 'id'
+        query_params= st.experimental_get_query_params()
+        if query_params:
+            student_id= query_params[key][0]
+            return student_id
+        else:
+            st.error("The student 'id' query parameter is missing.")
+            return None
+    except Exception as e:
+        st.error(f"An error occured: {e}")
+        return None
 
+def getStudents(student_id=queryIdParam()):
+    return f"{PATH_DOMAIN}/students/{student_id}"
 
+def postStudentsPresence(student_id=queryIdParam()):
+    return f"{PATH_DOMAIN}/students/{student_id}/present"
 class MockResponse:
     def __init__(self, json_data, status_code):
         self.json_data = json_data
@@ -32,7 +45,7 @@ def student_attendance(data):
     studentId = st.text_input(label='ID', value= data['id'],key='studentId', disabled=st.session_state.disabled)
     studentName = st.text_input(label='Name', value= data['name'],key='studentName', disabled=st.session_state.disabled)
     totalPresent = st.text_input(label='Total Presence', value= data['totalPresent'],key='totalPresent', disabled=st.session_state.disabled)
-    availableQuota = st.text_input(label='Available Attendance', value= data['availableQuota'],key='availableQuota', disabled=st.session_state.disabled)
+    availableQouta = st.text_input(label='Available Attendance', value= data['availableQuota'],key='availableQuota', disabled=st.session_state.disabled)
 
     # Mentor Validation
     with st.form(key='my_form', clear_on_submit=True):
@@ -47,44 +60,33 @@ def student_attendance(data):
         # st.write(f'ID: {studentId}, Student Name: {studentName}, Total Presence: {totalAttendance}, Available Quota: {availableAttendance} by Mentor Name: {mentorName} with password: {mentorPassword}')
         
         form_data = {
-        'studentId': studentId,
-        'studentName': studentName,
-        'totalAttendance': totalPresent,
-        'availableAttendance': availableQuota,
-        'mentorName': mentorName,
-        'mentorPassword': mentorPassword
+        'username': mentorName,
+        'password': mentorPassword
         }
 
         # Simulate a successful POST response
-        post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
-
-        # Check if the post request was successful
-        if post_response.status_code == 200:
-            print(post_response.json())
-            # print('Presence Successfully')
-            st.success('Presence Success!', icon="✅")
-        else:
-            print('Failed to post data')
+        # post_response = MockResponse({"success": True, "message": "Presence Successfully", "data":form_data}, 200)
 
         # Post the data to the API
-        # post_response = requests.post(POST_API, data=form_data)
-
-        # # Check if the post request was successful
-        # if post_response.status_code == 200:
-        #     st.write('Presence Successfully')
-        # else:
-        #     st.write('Failed to post data')
+        post_response = requests.post(postStudentsPresence(), json=form_data)
+        # Check if the post request was successful
+        if post_response.status_code == 201:
+            st.success('Presence Successfully')
+        else:
+            st.error('Failed to post data')
 
 # GET DATA FROM API
 # Hit the API
-response = requests.get(GET_API)
+response = requests.get(getStudents())
 
 # Check if the request was successful
 if response.status_code == 200:
     # Convert the response to JSON
     data = response.json()
-    student_attendance(data['data'])
+    if data['data']['totalPresent'] == data['data']['availableQuota']:
+        st.error('Student has reached the maximum attendance')
+    else:
+        student_attendance(data['data'])
 
 else:
     st.write('Failed to get data from the API')
-
